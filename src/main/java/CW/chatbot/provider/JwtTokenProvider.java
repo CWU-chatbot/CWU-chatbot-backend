@@ -56,6 +56,7 @@ public class JwtTokenProvider {
         long now = (new Date()).getTime();
 
         // Access Token 생성 : 인증된 사용자의 권한 정보와 만료 시간을 담고 있음
+        // 보통 토큰은 30분 정도로 생성하지만 테스트를 위해 1일로 설정
         Date accessTokenExpiresIn = new Date(now + 86400000); // 현재 시간에서 24시간 후의 시간
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName()) // Name 확인
