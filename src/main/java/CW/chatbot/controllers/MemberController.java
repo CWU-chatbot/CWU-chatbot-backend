@@ -1,29 +1,24 @@
 package CW.chatbot.controllers;
 
-import CW.chatbot.entities.Member;
-import CW.chatbot.controllers.dtos.MemberRequestDTO;
+import CW.chatbot.controllers.dtos.JwtToken;
+import CW.chatbot.controllers.dtos.MemberLoginRequestDTO;
 import CW.chatbot.services.MemberService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-//@RequestMapping("/member")
+@Slf4j
+@RestController
+@RequestMapping("/members")
 @RequiredArgsConstructor
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/members")
-    @ResponseBody
-    public Member createMember(@RequestBody MemberRequestDTO memberDTO) {
-        return memberService.saveMember(
-                memberDTO.getId(),
-                memberDTO.getUsername(),
-                memberDTO.getPassword()
-        );
+    @PostMapping("/login_select")
+    public JwtToken login(@RequestBody MemberLoginRequestDTO memberLoginRequestDTO) {
+        String id = memberLoginRequestDTO.getId();
+        String password = memberLoginRequestDTO.getPassword();
+        JwtToken jwtToken = memberService.login(id, password);
+        return jwtToken;
     }
 }
