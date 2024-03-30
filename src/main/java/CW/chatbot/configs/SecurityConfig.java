@@ -30,7 +30,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // 해당 API에 대해서는 모든 요청을 허가
-                        .requestMatchers("/members/login_select").permitAll()
+                        // 테스트를 위해 /chat으로 들어오는 요청 허가 (추후 삭제)
+                        .requestMatchers("/members/login_select", "/chat").permitAll()
                         // USER 권한이 있어야 요청할 수 있음
                         .requestMatchers("/members/test").hasRole("USER")
                         // 이 밖에 모든 요청에 대해서 인증 필요
