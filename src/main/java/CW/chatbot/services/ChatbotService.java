@@ -1,13 +1,14 @@
 package CW.chatbot.services;
 
-import CW.chatbot.controllers.dtos.ChatbotResponseDTO;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Objects;
 
 @Service
 public class ChatbotService {
@@ -26,15 +27,19 @@ public class ChatbotService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>("{\"question\":\"" + userQuestion + "\"}", headers);
 
-        ResponseEntity<ChatbotResponseDTO> response = restTemplate.exchange(
-                chatbotServiceUrl,
-                HttpMethod.POST,
-                entity,
-                ChatbotResponseDTO.class // 인공지능 서버의 응답 형식에 맞게 ChatbotResponseDTO 사용
-        );
+        // 서버로부터의 응답을 String 으로 받음
+        String jsonResponse = restTemplate.postForObject(chatbotServiceUrl, entity, String.class);
 
-        // 인공지능 서버에서 응답 받은 내용 확인 및 반환
-        System.out.println("챗봇 응답 : " + Objects.requireNonNull(response.getBody()).getAnswer());
-        return Objects.requireNonNull(response.getBody()).getAnswer();
+        // ObjectMapper를 사용하여 String 응답에서 "answer" 필드 추출
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            JsonNode root = mapper.readTree(jsonResponse);
+            String answer = root.path("answer").asText();
+            System.out.println("챗봇 응답 : " + answer); // 로그 출력
+            return answer;
+        } catch (Exception e) {
+            System.out.println("응답 처리 중 오류 발생: " + e.getMessage());
+            return e.getMessage();
+        }
     }
 }
