@@ -2,10 +2,13 @@ package CW.chatbot.controllers;
 
 import CW.chatbot.controllers.dtos.JwtToken;
 import CW.chatbot.controllers.dtos.MemberLoginRequestDTO;
+import CW.chatbot.controllers.dtos.MemberSignupDto;
+import CW.chatbot.controllers.dtos.SignUpDto;
 import CW.chatbot.services.MemberService;
 import CW.chatbot.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -28,5 +31,11 @@ public class MemberController {
     @PostMapping("/test") // User 권한을 가진 사용자에게 허용
     public String test() {
         return SecurityUtil.getCurrentUsername();
+    }
+
+    @PostMapping("/signUp")
+    public ResponseEntity<MemberSignupDto> signUp(@RequestBody SignUpDto signUpDto) {
+        MemberSignupDto savedMemberDto = memberService.signUp(signUpDto);
+        return ResponseEntity.ok(savedMemberDto);
     }
 }
