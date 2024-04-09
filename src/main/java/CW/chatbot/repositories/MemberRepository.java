@@ -9,6 +9,6 @@ import java.util.Optional;
 
 // JpaRepository를 이용한 데이터 접근
 @Repository
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, String> {
     Optional<Member> findById(String id);
 }

@@ -20,8 +20,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class Member implements UserDetails { // 사용자 정보
-    @Id
-    @Column(length=40, updatable = false, nullable = false, unique = true)
+    @Id @GeneratedValue
+    @Column(name = "no", updatable = false, unique = true, nullable = false)
+    private Long no;
+    @Column(length=40, nullable = false)
     private String id;
     @Column(length = 50, nullable = false)
     private String password;
@@ -29,9 +31,10 @@ public class Member implements UserDetails { // 사용자 정보
     private String username;
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private Set<Role> roles;
     //private Set<Role> role = Set.of(Role.ADMIN); // 기본값으로 ADMIN 설정
-    @Column(insertable = false)
+    @Column(name = "registration_date", insertable = false)
     private LocalDateTime registrationDate = LocalDateTime.now();
 
     @Override

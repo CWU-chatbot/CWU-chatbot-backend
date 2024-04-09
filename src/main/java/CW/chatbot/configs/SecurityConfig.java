@@ -31,9 +31,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // 해당 API에 대해서는 모든 요청을 허가
                         // 테스트를 위해 /chat으로 들어오는 요청 허가 (추후 삭제)
+                        .requestMatchers("/members/signup").permitAll()
                         .requestMatchers("/members/login_select", "/chat").permitAll()
-                        // USER 권한이 있어야 요청할 수 있음
-                        .requestMatchers("/members/test").hasRole("USER")
+                        // ADMIN 권한이 있어야 요청할 수 있음
+                        .requestMatchers("/members/test").hasRole("ADMIN")
                         // 이 밖에 모든 요청에 대해서 인증 필요
                         .anyRequest().authenticated())
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
