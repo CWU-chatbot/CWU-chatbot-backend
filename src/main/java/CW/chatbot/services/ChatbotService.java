@@ -1,10 +1,8 @@
 package CW.chatbot.services;
 
-import CW.chatbot.controllers.dtos.AIResponseDTO;
 import CW.chatbot.controllers.dtos.ChatbotException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,6 +35,8 @@ public class ChatbotService {
     }
 
     public String getChatbotResponse(String userQuestion) throws ChatbotException {
+        // 원래 로직 주석 처리
+        /*
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>("{\"question\":\"" + userQuestion + "\"}", headers);
@@ -53,6 +53,17 @@ public class ChatbotService {
             }
         } catch (Exception e) {
             throw new ChatbotException(HttpStatus.INTERNAL_SERVER_ERROR, "Error communicating with chatbot service");
+        }
+        */
+
+        if ("안녕".equals(userQuestion)) {
+            return "안녕하세요!";
+        } else if ("컴퓨터공학과 학회실은 어디에 있어?".equals(userQuestion)) {
+            return "인천광역시 미추홀구 숙골로 113(청운대학교 인천캠퍼스) 838호에요.";
+        }
+        // 위와같이 로직 추가
+        else {
+            return "그 질문에 답은 잘 모르겠어요";
         }
     }
 }
