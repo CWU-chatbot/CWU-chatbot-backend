@@ -36,15 +36,15 @@ public class ChatbotController {
     public ResponseEntity<ChatbotResponseDTO> getResponse(@RequestBody ChatbotRequestDTO request) {
         try {
             if (request.getContent() == null || request.getContent().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(new ChatbotResponseDTO(400, 0, "Content must not be empty", ""));
+                return ResponseEntity.badRequest().body(new ChatbotResponseDTO(400, "Content must not be empty", ""));
             }
 
             String responseContent = chatbotService.getChatbotResponse(request.getContent());
-            return ResponseEntity.ok(new ChatbotResponseDTO(200, 1, "Success", responseContent));
+            return ResponseEntity.ok(new ChatbotResponseDTO(200, "Success", responseContent));
         } catch (ChatbotException e) {
-            return ResponseEntity.status(e.getStatus()).body(new ChatbotResponseDTO(e.getStatus().value(), 0, e.getMessage(), null));
+            return ResponseEntity.status(e.getStatus()).body(new ChatbotResponseDTO(e.getStatus().value(), e.getMessage(), null));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new ChatbotResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), 0, "An unexpected error occurred", null));
+            return ResponseEntity.internalServerError().body(new ChatbotResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", null));
         }
     }
 }
