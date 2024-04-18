@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/login_select") // 모든 사용자에게 허용
+    @PostMapping("/sign_in") // 모든 사용자에게 허용
     public JwtToken login(@RequestBody MemberLoginRequestDTO memberLoginRequestDTO) {
         String id = memberLoginRequestDTO.getId();
         String password = memberLoginRequestDTO.getPassword();
@@ -33,7 +33,7 @@ public class MemberController {
         return SecurityUtil.getCurrentUsername();
     }
 
-    @PostMapping("/signUp")
+    @PostMapping("/sign_up")
     public ResponseEntity<MemberSignupDto> signUp(@RequestBody SignUpDto signUpDto) {
         MemberSignupDto savedMemberDto = memberService.signUp(signUpDto);
         return ResponseEntity.ok(savedMemberDto);

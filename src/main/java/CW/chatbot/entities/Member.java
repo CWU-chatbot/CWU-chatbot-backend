@@ -1,9 +1,12 @@
 package CW.chatbot.entities;
 
 import CW.chatbot.commons.constants.Role;
+import CW.chatbot.commons.constants.Status;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,22 +23,30 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class Member implements UserDetails { // 사용자 정보
-    @Id @GeneratedValue
-    @Column(name = "no", updatable = false, unique = true, nullable = false)
-    private Long no;
-    @Column(length=40, nullable = false)
+//    @Id @GeneratedValue
+//    @Column(name = "no", updatable = false, unique = true, nullable = false)
+//    private Long no;
+    @Id
+    @Column(name = "userId", unique = true, nullable = false)
     private String id;
     @Column(length = 50, nullable = false)
     private String password;
-    @Column(length = 40, nullable = false)
+    @Column(name = "userName", nullable = false)
     private String username;
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "role", nullable = false)
     private Set<Role> roles;
     //private Set<Role> role = Set.of(Role.ADMIN); // 기본값으로 ADMIN 설정
-    @Column(name = "registration_date", insertable = false)
-    private LocalDateTime registrationDate = LocalDateTime.now();
+    @CreationTimestamp
+    @Column(name = "createdDate", nullable = false)
+    private LocalDateTime createdDate;
+    @UpdateTimestamp
+    @Column(name = "modifiedDate", nullable = false)
+    private LocalDateTime modifiedDate;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private Set<Status> statuses;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
