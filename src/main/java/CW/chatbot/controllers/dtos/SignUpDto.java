@@ -19,7 +19,7 @@ public class SignUpDto {
     private String password;
     private String username;
     private Set<Role> roles;
-    private LocalDateTime registrationDate;
+    private LocalDateTime createdDate;
 
     public Member toEntity(String encodedPassword, Set<Role> roles) {
         return Member.builder()
@@ -27,7 +27,7 @@ public class SignUpDto {
                 .password(encodedPassword)
                 .username(username)
                 .roles(roles)
-                .registrationDate(registrationDate)
+                .createdDate(createdDate)
                 .build();
     }
 }

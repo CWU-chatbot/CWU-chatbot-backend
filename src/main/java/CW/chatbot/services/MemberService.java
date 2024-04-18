@@ -32,7 +32,7 @@ public class MemberService { // 서비스 클래스 - 로그인 메서드 구현
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
+    @Transactional // 메서드가 포함하고 있는 작업 중에 하나라도 실패할 경우 전체 작업을 취소
     public JwtToken login(String id, String password) {
         // Login ID/PW 기반으로 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(id, password);

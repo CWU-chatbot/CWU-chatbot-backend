@@ -1,13 +1,12 @@
 package CW.chatbot.controllers;
 
-import CW.chatbot.controllers.dtos.JwtToken;
-import CW.chatbot.controllers.dtos.MemberLoginRequestDTO;
-import CW.chatbot.controllers.dtos.MemberSignupDto;
-import CW.chatbot.controllers.dtos.SignUpDto;
+import CW.chatbot.controllers.dtos.*;
 import CW.chatbot.services.MemberService;
 import CW.chatbot.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,14 +17,26 @@ import org.springframework.web.bind.annotation.*;
 public class MemberController {
     private final MemberService memberService;
 
-    @PostMapping("/sign_in") // 모든 사용자에게 허용
-    public JwtToken login(@RequestBody MemberLoginRequestDTO memberLoginRequestDTO) {
-        String id = memberLoginRequestDTO.getId();
-        String password = memberLoginRequestDTO.getPassword();
-        JwtToken jwtToken = memberService.login(id, password);
-        log.info("request id = {}, password = {}", id, password);
-        log.info("jwtToken accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
-        return jwtToken;
+    @PostMapping(path = "/sign_in", produces = MediaType.APPLICATION_JSON_VALUE) // 모든 사용자에게 허용
+    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody SignInRequestDTO signInRequestDTO) {
+        try {
+            if (signInRequestDTO.getId() == null || signInRequestDTO.getPassword() == null) {
+                return ResponseEntity.badRequest().body(new SignInResponseDTO(400, "Id or Password not be empty", "", ""));
+            }
+
+            String id = signInRequestDTO.getId();
+            String password = signInRequestDTO.getPassword();
+            JwtToken jwtToken = memberService.login(id, password); // token 부여
+            String responseAccessToken = jwtToken.getAccessToken();
+            String responseRefreshToken = jwtToken.getRefreshToken();
+            log.info("request id = {}, password = {}", id, password);
+            log.info("jwtToken accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
+            return ResponseEntity.ok(new SignInResponseDTO(200, "Success", responseAccessToken, responseRefreshToken));
+        } catch (SignInException e) {
+            return ResponseEntity.status(e.getStatus()).body(new SignInResponseDTO(e.getStatus().value(), e.getMessage(), null, null));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(new SignInResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", null, null));
+        }
     }
 
     @PostMapping("/test") // User 권한을 가진 사용자에게 허용

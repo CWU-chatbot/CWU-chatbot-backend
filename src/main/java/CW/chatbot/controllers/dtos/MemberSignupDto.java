@@ -15,7 +15,7 @@ public class MemberSignupDto {
 
     static public MemberSignupDto toDto(Member member) {
         return MemberSignupDto.builder()
-                .no(member.getNo())
+                //.no(member.getNo())
                 .id(member.getId())
                 .username(member.getUsername())
                 .build();
@@ -23,7 +23,7 @@ public class MemberSignupDto {
 
     public Member toEntity() {
         return Member.builder()
-                .no(no)
+                //.no(no)
                 .id(id)
                 .username(username)
                 .build();
