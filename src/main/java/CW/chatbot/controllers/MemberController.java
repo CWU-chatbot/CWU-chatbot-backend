@@ -2,7 +2,6 @@ package CW.chatbot.controllers;
 
 import CW.chatbot.controllers.dtos.*;
 import CW.chatbot.services.MemberService;
-import CW.chatbot.utils.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

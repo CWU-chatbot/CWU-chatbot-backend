@@ -7,20 +7,14 @@ import CW.chatbot.controllers.dtos.SignUpDto;
 import CW.chatbot.entities.Member;
 import CW.chatbot.provider.JwtTokenProvider;
 import CW.chatbot.repositories.MemberRepository;
-import ch.qos.logback.classic.encoder.JsonEncoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
