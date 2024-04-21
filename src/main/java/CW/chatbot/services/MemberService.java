@@ -50,15 +50,21 @@ public class MemberService { // 서비스 클래스 - 로그인 메서드 구현
 
     @Transactional
     public MemberSignupDto signUp(SignUpDto signUpDto) {
-        if (memberRepository.existsById(signUpDto.getId())) {
+        log.info("회원가입 시도 ID: {}", signUpDto.getUserid());
+
+        if (memberRepository.existsById(signUpDto.getUserid())) {
+            log.warn("회원가입 실패 : ID 중복 : ", signUpDto.getUserid());
             throw new IllegalArgumentException("이미 사용중인 아이디 입니다.");
         }
         // Password 암호화
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
 
+        // 회원가입 시, USER 역할 부여
         Member member = signUpDto.toEntity(encodedPassword, Role.USER);
-        Member savedMember = memberRepository.save(member);
+        memberRepository.save(member);
 
-        return MemberSignupDto.toDto(savedMember);
+        log.info("회원가입 성공 ID: {}", signUpDto.getUserid());
+        
+        return MemberSignupDto.toDto(member);
     }
 }

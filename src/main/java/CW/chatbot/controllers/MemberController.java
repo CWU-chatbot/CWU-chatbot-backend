@@ -41,17 +41,29 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/test") // User 권한을 가진 사용자에게 허용
-    public String test() {
-        return SecurityUtil.getCurrentUsername();
-    }
+//    @PostMapping("/test") // User 권한을 가진 사용자에게 허용
+//    public String test() {
+//        return SecurityUtil.getCurrentUsername();
+//    }
 
     @PostMapping("/sign_up")
-    public ResponseEntity<MemberSignupDto> signUp(@RequestBody SignUpDto signUpDto) {
-        if (signUpDto.getId() == null || signUpDto.getPassword() == null) {
-            return ResponseEntity.badRequest().body(null);
+    public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody SignUpDto signUpDto) {
+        log.debug("Received signUp request with ID: {}", signUpDto.getUserid());
+        if (signUpDto.getUserid() == null || signUpDto.getPassword() == null || signUpDto.getNickname() == null) {
+            log.debug("Bad Request: Missign required fields");
+            return ResponseEntity.badRequest().body(new SignUpResponseDTO(400, "Invalid request", "Failure"));
         }
-        MemberSignupDto savedMemberDto = memberService.signUp(signUpDto);
-        return ResponseEntity.ok(savedMemberDto);
+        try {
+            memberService.signUp(signUpDto);
+            log.debug("SignUp Success: {}", signUpDto.getUserid());
+            return ResponseEntity.ok(new SignUpResponseDTO(200, "Success", "Success"));
+        } catch (IllegalArgumentException e) {
+            log.error("SignUp Failure: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new SignUpResponseDTO(400, e.getMessage(), "Failure"));
+        } catch (Exception e) {
+            log.error("Internal Server Error: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body(new SignUpResponseDTO(500, "Internal Server Error", "Failure"));
+        }
     }
+
 }
