@@ -29,12 +29,14 @@ public class MemberController {
             JwtToken jwtToken = memberService.login(id, password); // token 부여
             String responseAccessToken = jwtToken.getAccessToken();
             String responseRefreshToken = jwtToken.getRefreshToken();
-            log.info("request id = {}, password = {}", id, password);
+            log.info("request id = {}, password = {}", id, password); // 후에 비밀번호 로그 제거 예정
             log.info("jwtToken accessToken = {}, refreshToken = {}", jwtToken.getAccessToken(), jwtToken.getRefreshToken());
             return ResponseEntity.ok(new SignInResponseDTO(200, "Success", responseAccessToken, responseRefreshToken));
         } catch (SignInException e) {
             return ResponseEntity.status(e.getStatus()).body(new SignInResponseDTO(e.getStatus().value(), e.getMessage(), null, null));
         } catch (Exception e) {
+            e.printStackTrace();
+            log.error("An unexpected error occurred: " + e.getMessage());
             return ResponseEntity.internalServerError().body(new SignInResponseDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An unexpected error occurred", null, null));
         }
     }
@@ -46,6 +48,9 @@ public class MemberController {
 
     @PostMapping("/sign_up")
     public ResponseEntity<MemberSignupDto> signUp(@RequestBody SignUpDto signUpDto) {
+        if (signUpDto.getId() == null || signUpDto.getPassword() == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
         MemberSignupDto savedMemberDto = memberService.signUp(signUpDto);
         return ResponseEntity.ok(savedMemberDto);
     }

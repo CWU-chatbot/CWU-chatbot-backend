@@ -56,9 +56,7 @@ public class MemberService { // 서비스 클래스 - 로그인 메서드 구현
         // Password 암호화
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
 
-        Set<Role> roles = EnumSet.of(Role.USER);
-
-        Member member = signUpDto.toEntity(encodedPassword, roles);
+        Member member = signUpDto.toEntity(encodedPassword, Role.USER);
         Member savedMember = memberRepository.save(member);
 
         return MemberSignupDto.toDto(savedMember);

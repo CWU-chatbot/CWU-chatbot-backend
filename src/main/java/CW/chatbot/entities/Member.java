@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "USERS")
 public class Member implements UserDetails { // 사용자 정보
 //    @Id @GeneratedValue
 //    @Column(name = "no", updatable = false, unique = true, nullable = false)
@@ -33,10 +35,11 @@ public class Member implements UserDetails { // 사용자 정보
     private String password;
     @Column(name = "userName", nullable = false)
     private String username;
-    @ElementCollection(fetch = FetchType.EAGER)
+   // @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private Set<Role> roles;
+    private Role role;
+    //private Set<Role> roles;
     //private Set<Role> role = Set.of(Role.ADMIN); // 기본값으로 ADMIN 설정
     @CreationTimestamp
     @Column(name = "createdDate", nullable = false)
@@ -46,13 +49,15 @@ public class Member implements UserDetails { // 사용자 정보
     private LocalDateTime modifiedDate;
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private Set<Status> statuses;
+    private Status status;
+    //private Set<Status> statuses;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
-                .collect(Collectors.toSet());
+//        return this.roles.stream()
+//                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+//                .collect(Collectors.toSet());
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
     } // "ROLE_" 접두사는 Spring Security에서 권한을 표현하는 표준 방식 -> 권한을 명확하게 지정할 수 있음
 
     @Override
@@ -82,6 +87,6 @@ public class Member implements UserDetails { // 사용자 정보
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.status == Status.Active; // 계정이 활성화 상태일 때만 true 반환
     }
 }
