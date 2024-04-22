@@ -1,6 +1,7 @@
 package CW.chatbot.controllers.dtos;
 
 import CW.chatbot.commons.constants.Role;
+import CW.chatbot.commons.constants.Status;
 import CW.chatbot.entities.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,26 +9,36 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+
+/**
+ *  SignUpDTO
+ *  이 클래스는 회원가입 요청을 처리하는 데 사용되는 DTO 이다.
+ *  회원가입 시 필요한 데이터를 수집하는 데 사용된다.
+ *  이 데이터는 서버로 전송되어 회원가입 로직을 처리하는 데 필요하다.
+ *
+ *  주요 목적 :
+ *  클라이언트로 받은 원시 데이터를 안전하게 서버로 전달하는 것
+ */
 
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignUpDto {
-    private String id;
+    private String userid;
     private String password;
-    private String username;
-    private Set<Role> roles;
-    private LocalDateTime registrationDate;
+    private String nickname;
+    private Role role;
+    private LocalDateTime createdDate;
 
-    public Member toEntity(String encodedPassword, Set<Role> roles) {
+    public Member toEntity(String encodedPassword, Role role) {
         return Member.builder()
-                .id(id)
+                .id(userid)
                 .password(encodedPassword)
-                .username(username)
-                .roles(roles)
-                .registrationDate(registrationDate)
+                .username(nickname)
+                .role(role)
+                .status(Status.Active)
+                .createdDate(createdDate == null ? LocalDateTime.now() : createdDate)
                 .build();
     }
 }

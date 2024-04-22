@@ -7,7 +7,7 @@ import lombok.ToString;
 @Data
 @ToString
 @NoArgsConstructor
-public class MemberLoginRequestDTO {
+public class SignInRequestDTO {
     private String id;
     private String password;
 }

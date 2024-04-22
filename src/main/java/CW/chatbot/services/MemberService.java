@@ -7,20 +7,14 @@ import CW.chatbot.controllers.dtos.SignUpDto;
 import CW.chatbot.entities.Member;
 import CW.chatbot.provider.JwtTokenProvider;
 import CW.chatbot.repositories.MemberRepository;
-import ch.qos.logback.classic.encoder.JsonEncoder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +26,7 @@ public class MemberService { // 서비스 클래스 - 로그인 메서드 구현
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
+    @Transactional // 메서드가 포함하고 있는 작업 중에 하나라도 실패할 경우 전체 작업을 취소
     public JwtToken login(String id, String password) {
         // Login ID/PW 기반으로 Authentication 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(id, password);
@@ -50,17 +44,21 @@ public class MemberService { // 서비스 클래스 - 로그인 메서드 구현
 
     @Transactional
     public MemberSignupDto signUp(SignUpDto signUpDto) {
-        if (memberRepository.existsById(signUpDto.getId())) {
+        log.info("회원가입 시도 ID: {}", signUpDto.getUserid());
+
+        if (memberRepository.existsById(signUpDto.getUserid())) {
+            log.warn("회원가입 실패 : ID 중복 : ", signUpDto.getUserid());
             throw new IllegalArgumentException("이미 사용중인 아이디 입니다.");
         }
         // Password 암호화
         String encodedPassword = passwordEncoder.encode(signUpDto.getPassword());
 
-        Set<Role> roles = EnumSet.of(Role.USER);
+        // 회원가입 시, USER 역할 부여
+        Member member = signUpDto.toEntity(encodedPassword, Role.USER);
+        memberRepository.save(member);
 
-        Member member = signUpDto.toEntity(encodedPassword, roles);
-        Member savedMember = memberRepository.save(member);
-
-        return MemberSignupDto.toDto(savedMember);
+        log.info("회원가입 성공 ID: {}", signUpDto.getUserid());
+        
+        return MemberSignupDto.toDto(member);
     }
 }
