@@ -14,5 +14,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ChatbotRequestDTO {
+    private int folderId;
     private String content;
 }
