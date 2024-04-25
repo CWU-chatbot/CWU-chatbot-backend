@@ -1,8 +1,16 @@
 package CW.chatbot.services;
 
+import CW.chatbot.controllers.dtos.AIResponseDTO;
 import CW.chatbot.controllers.dtos.ChatbotException;
+import CW.chatbot.entities.ChatbotResponse;
+import CW.chatbot.commons.constants.logType;
+import CW.chatbot.provider.JwtTokenProvider;
+import CW.chatbot.repositories.ChatbotResponseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -27,26 +35,30 @@ public class ChatbotService {
 
     private final RestTemplate restTemplate;
     private final String chatbotServiceUrl;
+    private final ChatbotResponseRepository chatbotResponseRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public ChatbotService(RestTemplate restTemplate, @Value("${chatbot.service.url}") String chatbotServiceUrl) {
+    public ChatbotService(RestTemplate restTemplate, ChatbotResponseRepository chatbotResponseRepository, JwtTokenProvider jwtTokenProvider, @Value("${chatbot.service.url}") String chatbotServiceUrl) {
         this.restTemplate = restTemplate;
         this.chatbotServiceUrl = chatbotServiceUrl;
+        this.chatbotResponseRepository = chatbotResponseRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    public String getChatbotResponse(String userQuestion) throws ChatbotException {
-        // 원래 로직 주석 처리
-        /*
+    /*public String getChatbotResponse(String userQuestion, String token) throws ChatbotException {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>("{\"question\":\"" + userQuestion + "\"}", headers);
 
         try {
-            ResponseEntity<AIResponseDTO> response = restTemplate.exchange(
-                    chatbotServiceUrl, HttpMethod.POST, entity, AIResponseDTO.class);
+            ResponseEntity<AIResponseDTO> response = restTemplate.exchange(chatbotServiceUrl, HttpMethod.POST, entity, AIResponseDTO.class);
 
             AIResponseDTO aiResponse = response.getBody();
             if (aiResponse != null) {
+                String userId = JwtTokenProvider.getUserIdFromToken(token);  // 토큰에서 userId 추출
+                ChatbotResponse chatbotResponse = new ChatbotResponse(userId, aiResponse.getAnswer());
+                chatbotResponseRepository.save(chatbotResponse);
                 return aiResponse.getAnswer();
             } else {
                 throw new ChatbotException(HttpStatus.INTERNAL_SERVER_ERROR, "Received null response from chatbot service");
@@ -54,16 +66,34 @@ public class ChatbotService {
         } catch (Exception e) {
             throw new ChatbotException(HttpStatus.INTERNAL_SERVER_ERROR, "Error communicating with chatbot service");
         }
-        */
+    }*/
+
+    // ChatbotService 클래스 내부에서 토큰 처리 부분 수정
+    public String getChatbotResponse(int folderId, String userQuestion, String token) throws ChatbotException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 하드코딩으로 응답 설정
+        AIResponseDTO aiResponse = new AIResponseDTO();
 
         if ("안녕".equals(userQuestion)) {
-            return "안녕하세요!";
+            aiResponse.setAnswer("안녕하세요!");
         } else if ("컴퓨터공학과 학회실은 어디에 있어?".equals(userQuestion)) {
-            return "인천광역시 미추홀구 숙골로 113(청운대학교 인천캠퍼스) 838호에요.";
+            aiResponse.setAnswer("인천광역시 미추홀구 숙골로 113(청운대학교 인천캠퍼스) 838호에요.");
         }
-        // 위와같이 로직 추가
         else {
-            return "그 질문에 답은 잘 모르겠어요";
+            aiResponse.setAnswer("그 질문에 답은 잘 모르겠어요");
+        }
+
+        try {
+            ChatbotResponse userRequest = new ChatbotResponse(folderId, logType.User, userQuestion);
+            chatbotResponseRepository.save(userRequest);
+            ChatbotResponse chatbotResponse = new ChatbotResponse(folderId, logType.Ai, aiResponse.getAnswer());
+            chatbotResponseRepository.save(chatbotResponse);
+
+            return aiResponse.getAnswer();
+        } catch (Exception e) {
+            throw new ChatbotException(HttpStatus.INTERNAL_SERVER_ERROR, "Error extracting user from token: " + e.getMessage());
         }
     }
 }
