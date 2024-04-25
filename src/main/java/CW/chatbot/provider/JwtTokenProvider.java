@@ -99,6 +99,20 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
+    public String getUserIdFromToken(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        Claims claims = parseClaims(token);
+        String userId = claims.getSubject();
+        if (userId == null) {
+            throw new RuntimeException("토큰에서 userId를 찾을 수 없습니다.");
+        }
+        return userId;
+    }
+
+
     // 토큰 정보를 검증하는 메서드 (유효성 확인)
     public boolean validateToken(String token) {
         try {
