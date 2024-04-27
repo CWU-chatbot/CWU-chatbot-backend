@@ -1,12 +1,13 @@
 package CW.chatbot.services;
 
+import CW.chatbot.controllers.dtos.changefolder.ChangeFolderDataDTO;
 import CW.chatbot.controllers.dtos.loadfolder.LoadFolderDataDTO;
-import CW.chatbot.controllers.dtos.loadfolder.LoadFolderResponseDTO;
 import CW.chatbot.entities.FOLERS;
+import CW.chatbot.entities.LOGS;
 import CW.chatbot.provider.JwtTokenProvider;
 import CW.chatbot.repositories.FoldersRepository;
+import CW.chatbot.repositories.LogsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,20 +17,29 @@ public class FolderService {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final FoldersRepository foldersRepository;
+    private final LogsRepository logsRepository;
 
     @Autowired
-    public FolderService(JwtTokenProvider jwtTokenProvider, FoldersRepository foldersRepository) {
+    public FolderService(JwtTokenProvider jwtTokenProvider, FoldersRepository foldersRepository, LogsRepository logsRepository) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.foldersRepository = foldersRepository;
+        this.logsRepository = logsRepository;
     }
 
-    public ResponseEntity<LoadFolderResponseDTO> loadFolders(String token) {
-        String userId = jwtTokenProvider.getUserIdFromToken(token.replace("Bearer ", "").trim());
+    private String GetUserId(String token) {
+        return jwtTokenProvider.getUserIdFromToken(token.replace("Bearer ", "").trim());
+    }
+
+    public LoadFolderDataDTO loadFolders(String token) {
+        String userId = GetUserId(token);
         List<FOLERS> dataList = foldersRepository.findByUserId(userId);
 
-        LoadFolderDataDTO data = new LoadFolderDataDTO(dataList);
+        return new LoadFolderDataDTO(dataList);
+    }
 
-        LoadFolderResponseDTO response = new LoadFolderResponseDTO(200, "Success", data);
-        return ResponseEntity.ok(response);
+    public ChangeFolderDataDTO changeFolders(int folderId) {
+        List<LOGS> dataList = logsRepository.findByFolderId(folderId);
+
+        return new ChangeFolderDataDTO(dataList);
     }
 }
