@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SignUpResponseDTO {
+public class SignUpResDTO {
     private int resultCode;
     private String resultMessage;
     private String result;

@@ -41,22 +41,22 @@ public class MemberController {
     }
 
     @PostMapping(value = "/sign_up")
-    public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody SignUpReqDto signUpReqDto) {
+    public ResponseEntity<SignUpResDTO> signUp(@RequestBody SignUpReqDto signUpReqDto) {
         log.debug("Received signUp request with ID: {}", signUpReqDto.getUserid());
         if (signUpReqDto.getUserid() == null || signUpReqDto.getPassword() == null || signUpReqDto.getNickname() == null) {
             log.debug("Bad Request: Missign required fields");
-            return ResponseEntity.badRequest().body(new SignUpResponseDTO(400, "Invalid request", "Failure"));
+            return ResponseEntity.badRequest().body(new SignUpResDTO(400, "Invalid request", "Failure"));
         }
         try {
             memberService.signUp(signUpReqDto);
             log.debug("SignUp Success: {}", signUpReqDto.getUserid());
-            return ResponseEntity.ok(new SignUpResponseDTO(200, "Success", "Success"));
+            return ResponseEntity.ok(new SignUpResDTO(200, "Success", "Success"));
         } catch (IllegalArgumentException e) {
             log.error("SignUp Failure: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(new SignUpResponseDTO(400, e.getMessage(), "Failure"));
+            return ResponseEntity.badRequest().body(new SignUpResDTO(400, e.getMessage(), "Failure"));
         } catch (Exception e) {
             log.error("Internal Server Error: {}", e.getMessage());
-            return ResponseEntity.internalServerError().body(new SignUpResponseDTO(500, "Internal Server Error", "Failure"));
+            return ResponseEntity.internalServerError().body(new SignUpResDTO(500, "Internal Server Error", "Failure"));
         }
     }
 
