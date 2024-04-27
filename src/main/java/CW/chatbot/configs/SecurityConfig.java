@@ -1,6 +1,6 @@
 package CW.chatbot.configs;
 
-import CW.chatbot.filters.JwtAuthenticationFilter;
+import CW.chatbot.filters.JwtAuthFilter;
 import CW.chatbot.provider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +38,7 @@ public class SecurityConfig {
                         // 이 밖에 모든 요청에 대해서 인증 필요
                         .anyRequest().authenticated())
                 // JWT 인증을 위하여 직접 구현한 필터를 UsernamePasswordAuthenticationFilter 전에 실행
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                .addFilterBefore(new JwtAuthFilter(jwtTokenProvider),
                         UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
     }
