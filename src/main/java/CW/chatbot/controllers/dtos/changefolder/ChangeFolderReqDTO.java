@@ -6,14 +6,8 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ChangeFolderReqDTO {
-    private int folderId;
-    private String newContent;
+    private Integer folderId;
 
     public ChangeFolderReqDTO() {
-    }
-
-    public ChangeFolderReqDTO(int folderId, String newContent) {
-        this.folderId = folderId;
-        this.newContent = newContent;
     }
 }
