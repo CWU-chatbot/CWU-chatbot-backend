@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SignInResponseDTO {
+public class SignInResDTO {
     private int resultCode;
     private String resultMessage;
     private String accessToken;
