@@ -1,6 +1,7 @@
 package CW.chatbot.entities;
 
 import CW.chatbot.commons.constants.logType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,9 +16,11 @@ import java.time.LocalDateTime;
 public final class LOGS {
 
     @Id
+    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int logId;
 
+    @JsonIgnore
     @Column(name = "folderId", nullable = false)
     private int folderId;
 
