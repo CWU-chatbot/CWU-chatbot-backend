@@ -3,6 +3,8 @@ package CW.chatbot.controllers;
 import CW.chatbot.controllers.dtos.changefolder.ChangeFolderDataDTO;
 import CW.chatbot.controllers.dtos.changefolder.ChangeFolderReqDTO;
 import CW.chatbot.controllers.dtos.changefolder.ChangeFolderResDTO;
+import CW.chatbot.controllers.dtos.deletefolder.DeleteFolderReqDTO;
+import CW.chatbot.controllers.dtos.deletefolder.DeleteFolderResDTO;
 import CW.chatbot.controllers.dtos.loadfolder.LoadFolderDataDTO;
 import CW.chatbot.controllers.dtos.loadfolder.LoadFolderResDTO;
 import CW.chatbot.services.FolderService;
@@ -43,7 +45,13 @@ public class FolderController {
     }
 
     @PostMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> deleteFolder(@RequestParam("folderId") int folderId) {
-        return ResponseEntity.ok("Delete endpoint hit");
+    public ResponseEntity<DeleteFolderResDTO> deleteFolder(@RequestBody DeleteFolderReqDTO DeleteFolderReqDTO) {
+        if (DeleteFolderReqDTO.getFolderId() == null) {
+            return ResponseEntity.badRequest().body(new DeleteFolderResDTO(400, "folderId not be empty", "Fail"));
+        }
+        int folderId = DeleteFolderReqDTO.getFolderId();
+
+        String result = folderService.DeleteFolders(folderId);
+        return ResponseEntity.ok(new DeleteFolderResDTO(200, "Success", result));
     }
 }

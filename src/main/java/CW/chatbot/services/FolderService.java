@@ -42,4 +42,10 @@ public class FolderService {
 
         return new ChangeFolderDataDTO(dataList);
     }
+
+    public String DeleteFolders(int folderId) {
+        foldersRepository.deleteByFolderId(folderId);
+
+        return "Success";
+    }
 }
