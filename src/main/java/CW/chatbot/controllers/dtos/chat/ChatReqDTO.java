@@ -6,6 +6,6 @@ import lombok.Setter;
 @Setter
 @Getter
 public class ChatReqDTO {
-    private int folderId;
+    private Integer folderId;
     private String content;
 }

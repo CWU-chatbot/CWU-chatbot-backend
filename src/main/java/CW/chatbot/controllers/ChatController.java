@@ -42,9 +42,15 @@ public class ChatController {
     public ResponseEntity<ChatResDTO> getResponse(@RequestBody ChatReqDTO request, @RequestHeader("Authorization") String authorizationHeader) {
         String token = authorizationHeader.replace("Bearer ", "").trim();
         try {
+
             if (request.getContent() == null || request.getContent().trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(new ChatResDTO(400, "Content must not be empty", ""));
             }
+
+            if (request.getFolderId() == null || request.getFolderId() <= 0) {
+                return ResponseEntity.badRequest().body(new ChatResDTO(400, "Folder ID must not be empty", ""));
+            }
+
             String responseContent = chatService.getChatbotResponse(request.getFolderId(), request.getContent(), token);
             return ResponseEntity.ok(new ChatResDTO(200, "Success", responseContent));
         } catch (ChatExceptionDTO e) {

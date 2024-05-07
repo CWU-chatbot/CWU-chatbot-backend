@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 폴더 관련 작업을 처리하는 서비스 클래스.
@@ -67,11 +68,11 @@ public class FolderService {
     }
 
     // 폴더 생성
-    public String createFolders(String token, String content) throws Exception {
+    public int createFolders(String token, String content) throws Exception {
         String userId = GetUserId(token);
         FOLERS userRequest = new FOLERS(userId, content);
-        foldersRepository.save(userRequest);
-        return "Success";
+        FOLERS savedFolder = foldersRepository.save(userRequest);
+        return savedFolder.getFolderId();
     }
 
     // 폴더 로드
@@ -79,7 +80,7 @@ public class FolderService {
         String userId = GetUserId(token);
         List<FOLERS> dataList = foldersRepository.findByUserId(userId);
         if (dataList == null || dataList.isEmpty()) {
-            throw new Exception("No folders found for this user");
+            throw new Exception("No folders found for user ID: " + userId);
         }
         return new LoadFolderDataDTO(dataList);
     }
@@ -95,7 +96,11 @@ public class FolderService {
 
     // 폴더 삭제
     public String DeleteFolders(int folderId) throws Exception {
-        foldersRepository.deleteByFolderId(folderId);
+        Optional<FOLERS> folder = foldersRepository.findById(folderId);
+        if (folder.isEmpty()) {
+            throw new Exception("No folder found with ID: " + folderId);
+        }
+        foldersRepository.delete(folder.get());
         return "Success";
     }
 }
