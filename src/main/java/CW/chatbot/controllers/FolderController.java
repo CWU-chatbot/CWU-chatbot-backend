@@ -11,6 +11,7 @@ import CW.chatbot.controllers.dtos.loadfolder.LoadFolderDataDTO;
 import CW.chatbot.controllers.dtos.loadfolder.LoadFolderResDTO;
 import CW.chatbot.services.FolderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,10 +56,10 @@ public class FolderController {
     public ResponseEntity<?> createFolders(@RequestHeader("Authorization") String token, @RequestBody CreateFolderReqDTO CreateFolderReqDTO) {
         try {
             if (CreateFolderReqDTO.getFolderContent() == null || CreateFolderReqDTO.getFolderContent().trim().isEmpty()) {
-                return ResponseEntity.badRequest().body(new CreateFolderResDTO(400, "folderContent cannot be empty", "Fail"));
+                return ResponseEntity.badRequest().body(new CreateFolderResDTO(400, "Folder content cannot be empty", "Fail"));
             }
-            String result = folderService.createFolders(token, CreateFolderReqDTO.getFolderContent());
-            return ResponseEntity.ok(new CreateFolderResDTO(200, "Success", result));
+            int folderId = folderService.createFolders(token, CreateFolderReqDTO.getFolderContent());
+            return ResponseEntity.ok(new CreateFolderResDTO(200, "Success", Integer.toString(folderId)));  // Now returning folder ID
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(new CreateFolderResDTO(500, "Internal Server Error", "Fail"));
         }
@@ -80,29 +81,30 @@ public class FolderController {
 
     // 폴더 변경
     @PostMapping(value = "/change", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> changeFolder(@RequestBody ChangeFolderReqDTO ChangeFolderReqDTO) {
+    public ResponseEntity<?> changeFolder(@RequestBody ChangeFolderReqDTO changeFolderReqDTO) {
         try {
-            if (ChangeFolderReqDTO.getFolderId() == null) {
+            if (changeFolderReqDTO.getFolderId() == null) {
                 return ResponseEntity.badRequest().body(new ChangeFolderResDTO(400, "folderId cannot be empty", null));
             }
-            ChangeFolderDataDTO data = folderService.changeFolders(ChangeFolderReqDTO.getFolderId());
+            ChangeFolderDataDTO data = folderService.changeFolders(changeFolderReqDTO.getFolderId());
             return ResponseEntity.ok(new ChangeFolderResDTO(200, "Success", data));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new ChangeFolderResDTO(500, "Internal Server Error", null));
+            // 예외 메시지를 클라이언트의 요청 형식에 맞추어 JSON 구조로 반환
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ChangeFolderResDTO(404, e.getMessage(), null));
         }
     }
 
     // 폴더 삭제
     @PostMapping(value = "/delete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteFolder(@RequestBody DeleteFolderReqDTO DeleteFolderReqDTO) {
+    public ResponseEntity<?> deleteFolder(@RequestBody DeleteFolderReqDTO deleteFolderReqDTO) {
         try {
-            if (DeleteFolderReqDTO.getFolderId() == null) {
-                return ResponseEntity.badRequest().body(new DeleteFolderResDTO(400, "folderId cannot be empty", "Fail"));
+            if (deleteFolderReqDTO.getFolderId() == null) {
+                return ResponseEntity.badRequest().body(new DeleteFolderResDTO(400, "Folder ID cannot be empty", "Fail"));
             }
-            String result = folderService.DeleteFolders(DeleteFolderReqDTO.getFolderId());
+            String result = folderService.DeleteFolders(deleteFolderReqDTO.getFolderId());
             return ResponseEntity.ok(new DeleteFolderResDTO(200, "Success", result));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(new DeleteFolderResDTO(500, "Internal Server Error", "Fail"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new DeleteFolderResDTO(404, e.getMessage(), "Fail"));
         }
     }
 }
